@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -11,8 +12,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class Mainframe {
-    public static boolean confirm = false;
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             createMenuWindow();
@@ -25,7 +24,6 @@ public class Mainframe {
         frame.setSize(1100, 943);
         frame.setResizable(false);
         frame.getContentPane().setBackground(Color.DARK_GRAY);
-
 
         // Create a custom header panel with a background image
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)) {
@@ -51,7 +49,7 @@ public class Mainframe {
             // Load the background image
             {
                 try {
-                    background = ImageIO.read(new File("bg.jpg")); // Replace with the actual file path
+                    background = ImageIO.read(new File("bg1.jpg")); // Replace with the actual file path
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -73,21 +71,61 @@ public class Mainframe {
 
         // Create a custom JPanel for the center with rounded edges
         JPanel centerPanel = new JPanel() {
+            private BufferedImage background;
+            private int yOffset = 0; // Initialize the vertical offset
+
             @Override
             protected void paintComponent(Graphics g) {
-                if (g instanceof Graphics2D) {
+                super.paintComponent(g);
+                if (background != null) {
                     Graphics2D g2d = (Graphics2D) g;
-                    int arcWidth = 25; // Adjust the arc width to change the roundness
-                    int arcHeight = 25; // Adjust the arc height to change the roundness
-                    Shape roundedRect = new RoundRectangle2D.Double(0, 15, getWidth(), getHeight(), arcWidth, arcHeight);
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2d.setColor(getBackground());
-                    g2d.fill(roundedRect);
-                } else {
-                    super.paintComponent(g);
+
+                    // Calculate the adjusted y-coordinate based on the mouse's position
+                    int adjustedY = 15 - yOffset;
+
+                    // Draw the background image with opacity
+                    float opacity = 0.9f; // Adjust the opacity (0.0f to 1.0f)
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+                    g2d.drawImage(background, 0, adjustedY, getWidth(), getHeight() + yOffset, this);
+
+                    // Draw a dark overlay to make it darker
+                    g2d.setColor(new Color(0, 0, 0, 100)); // Adjust the color and alpha value
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+
+            // Load the background image
+            {
+                try {
+                    background = ImageIO.read(new File("bg.jpg")); // Replace with the actual file path
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         };
+
+        // Add a MouseListener and MouseMotionListener for parallax scrolling
+        centerPanel.addMouseListener(new MouseAdapter() {
+            private int lastY;
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                lastY = e.getY();
+            }
+        });
+
+        centerPanel.addMouseMotionListener(new MouseAdapter() {
+            private int lastY;
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int mouseY = e.getY();
+                int deltaY = mouseY - lastY;
+                int yOffset = deltaY;
+                lastY = mouseY;
+                centerPanel.repaint(); // Repaint the panel to update the background position
+            }
+        });
 
         // Set the background of the center panel to be transparent
         centerPanel.setOpaque(false);
@@ -127,8 +165,6 @@ BubbleButton buyTicketButton = new BubbleButton("Buy Ticket");
         buyTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                new MovieTicketBookingSystem();
             
             }
         });
@@ -161,10 +197,6 @@ BubbleButton buyTicketButton1 = new BubbleButton("Buy Ticket");
         buyTicketButton1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            
-
-                new MovieTicketBookingSystem();
-                
             
             }
         });
@@ -259,21 +291,9 @@ centerPanel.add(ohImagePanel);
         headerPanel.add(textLabel);
 
         // Create buttons with bubble coloring effect using BubbleButton class
-        BubbleButton profileButton = new BubbleButton("Profile");
+        BubbleButton homeButton = new BubbleButton("Home");
         BubbleButton receiptButton = new BubbleButton("Check Receipts");
-
-        receiptButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae){
-
-                MovieTicketBookingSystem mtbs = new MovieTicketBookingSystem();
-
-                mtbs.viewReceipts();
-            }
-        });
-
-        
-      
-
+        BubbleButton checkoutButton = new BubbleButton("Check Out");
 
         // Create a "Logout" button with the logout.png image
         JButton logoutButton = new JButton();
@@ -309,14 +329,8 @@ centerPanel.add(ohImagePanel);
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            
-                new Logout();
-
-                if (confirm){
-                    frame.dispose();
-                    
-                }
-                
+                // Implement the logout functionality here
+                // For example, close the application or navigate to a logout page
             }
         });
 
@@ -330,10 +344,11 @@ centerPanel.add(ohImagePanel);
         // Add buttons to leftPanel using BoxLayout
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        leftPanel.add(profileButton);
+        leftPanel.add(homeButton);
         leftPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         leftPanel.add(receiptButton);
-
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        leftPanel.add(checkoutButton);
 
         // Add the "Logout" button to the bottom of the left panel
         leftPanel.add(Box.createRigidArea(new Dimension(0, 350)));
@@ -376,3 +391,4 @@ centerPanel.add(ohImagePanel);
         return imageButton;
     }
 }
+
