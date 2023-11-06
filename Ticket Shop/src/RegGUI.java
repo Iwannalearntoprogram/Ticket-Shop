@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class RegGUI {
-    public static void main(String[] args) {
+    public RegGUI(){
         JFrame frame = new JFrame("Registration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(449, 600);
@@ -26,21 +26,22 @@ public class RegGUI {
         // Set the font
         Font openSansFont = new Font("Open Sans", Font.BOLD, 15);
 
-        // Name Label
-        JLabel nameLabel = new JLabel("Name:");
-        nameLabel.setBounds(100, 120, 80, 20);
-        nameLabel.setFont(openSansFont);
+        // User Label
+        JLabel usernameLabel = new JLabel("Name: ");
+        usernameLabel.setBounds(100, 120, 80, 20);
+        usernameLabel.setFont(openSansFont);
 
         // Name Input (Oval Round Shape)
         JTextField nameField = createOvalTextField(100, 150, 200, 30, openSansFont);
 
-        // Age Label
-        JLabel ageLabel = new JLabel("Age:");
-        ageLabel.setBounds(100, 190, 80, 20);
-        ageLabel.setFont(openSansFont);
+        // Password Label
+        JLabel passwordLabel = new JLabel("Age");
+        passwordLabel.setBounds(100, 190, 80, 20);
+        passwordLabel.setFont(openSansFont);
 
-        // Age Input
-        JTextField ageField = createOvalTextField(100, 220, 200, 30, openSansFont);
+        // Password Input
+        JPasswordField passwordField = createOvalPasswordField(100, 410, 200, 30, openSansFont);
+        
 
         // Address Label
         JLabel addressLabel = new JLabel("Address:");
@@ -50,21 +51,21 @@ public class RegGUI {
         // Address Input
         JTextField addressField = createOvalTextField(100, 290, 200, 30, openSansFont);
 
-        // Username Label
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setBounds(100, 320, 80, 20);
-        usernameLabel.setFont(openSansFont);
+        // Name Label
+        JLabel nameLabel = new JLabel("User ");
+        nameLabel.setBounds(100, 320, 80, 20);
+        nameLabel.setFont(openSansFont);
 
         // Username Input (Oval Round Shape)
         JTextField usernameField = createOvalTextField(100, 350, 200, 30, openSansFont);
 
-        // Password Label
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(100, 380, 80, 20);
-        passwordLabel.setFont(openSansFont);
+        // AgeLabel
+        JLabel ageLabel = new JLabel("Password: ");
+        ageLabel.setBounds(100, 380, 80, 20);
+        ageLabel.setFont(openSansFont);
 
         // Password Input (Oval Round Shape)
-        JPasswordField passwordField = createOvalPasswordField(100, 410, 200, 30, openSansFont);
+        JTextField ageField = createOvalTextField(100, 220, 200, 30, openSansFont);
 
         // Register Button
         JButton registerButton = createClickableButton("Register", 100, 460, 200, 30, openSansFont, Color.BLACK, Color.GRAY, Color.DARK_GRAY);
@@ -94,30 +95,34 @@ public class RegGUI {
                 String password = new String(passwordField.getPassword());
 
                 // Perform validation, e.g., age check
-                if (age.isEmpty() || Integer.parseInt(age) < 15) {
-                    JOptionPane.showMessageDialog(frame, "Age must be 15 or above.", "Registration Error", JOptionPane.ERROR_MESSAGE);
+                try {
+                    int ageValue = Integer.parseInt(age);
+                    if (ageValue < 15) {
+                        JOptionPane.showMessageDialog(frame, "Age must be 15 or above.", "Registration Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid Age", "Registration Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 // Save the registration information to a text file
                 try {
                     BufferedWriter writer = new BufferedWriter(new FileWriter("accounts.txt", true));
-                    writer.write("Name: " + name);
+                    writer.write("User: " + username);
                     writer.newLine();
-                    writer.write("Age: " + age);
+                    writer.write("Password: " + password);
                     writer.newLine();
                     writer.write("Address: " + address);
                     writer.newLine();
-                    writer.write("Username: " + username);
+                    writer.write("Name: " + name);
                     writer.newLine();
-                    writer.write("Password: " + password);
+                    writer.write("Age: " + age);
                     writer.newLine();
                     writer.write("- - - - - - - - - - - - - - - - - - - - - - - - - -");
                     writer.newLine();
                     writer.close();
                     JOptionPane.showMessageDialog(frame, "Registration successful!", "Registration", JOptionPane.INFORMATION_MESSAGE);
-               
-               
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                     JOptionPane.showMessageDialog(frame, "Error saving registration data.", "Registration Error", JOptionPane.ERROR_MESSAGE);
