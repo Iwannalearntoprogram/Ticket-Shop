@@ -13,11 +13,18 @@ import java.io.IOException;
 public class Mainframe {
     public static boolean confirm = false;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            createMenuWindow();
-        });
-    }
+   // public static void main(String[] args) {
+       // SwingUtilities.invokeLater(() -> {
+
+public static void openMainFrame(){
+
+    createMenuWindow();
+    
+
+}
+         //   createMenuWindow();
+        //});
+   // }
 
     private static void createMenuWindow() {
         JFrame frame = new JFrame("Menu Window");
