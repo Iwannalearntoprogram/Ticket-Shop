@@ -3,11 +3,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class LoginGUI {
+public class LoginGUI extends Mainframe {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Login");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,8 +62,39 @@ public class LoginGUI {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implement login functionality here
-                // Example: Redirect to another window or perform login action
+                boolean matched = false;
+                String user = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+
+                try {
+                    FileReader fr = new FileReader("accounts.txt");
+                    BufferedReader br = new BufferedReader(fr);
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        if (line.equals("User: " + user) && br.readLine().equals("Password: " + password)) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    fr.close();
+                } catch (Exception ae) {
+                    ae.printStackTrace();
+                }
+
+                if (matched) {
+                    if (user.toLowerCase().contains("admin")) {
+                        // Handle admin login
+                    } else {
+
+                        Mainframe mf = new Mainframe();
+                        JOptionPane.showMessageDialog(frame, "Welcome!");
+                        frame.dispose();
+                        openMainFrame();
+                        
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Invalid Username or Password");
+                }
             }
         });
 
@@ -69,6 +102,8 @@ public class LoginGUI {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                new RegGUI();
                 // Implement registration functionality here
                 // Example: Redirect to registration window or perform registration action
             }
